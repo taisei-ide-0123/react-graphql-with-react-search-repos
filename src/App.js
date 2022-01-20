@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { ApolloProvider, Query } from "react-apollo";
 import client from "./client";
 import { SEARCH_REPOSITORIES } from "./graphql";
 
-const VARIABLES = {
+const DEFAULT_VARIABLES = {
   first: 5,
   after: null,
   last: null,
@@ -12,11 +12,24 @@ const VARIABLES = {
 };
 
 const App = () => {
+  const [query, setQuery] = useState(DEFAULT_VARIABLES.query);
+
+  const handleChange = (event) => {
+    setQuery(event.target.value);
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+  };
+
+  console.log("query", query);
   return (
     <ApolloProvider client={client}>
-      <div>Hey!!</div>
+      <form onSubmit={handleSubmit}>
+        <input type="text" value={query} onChange={handleChange} />
+      </form>
 
-      <Query query={SEARCH_REPOSITORIES} variables={{ ...VARIABLES }}>
+      <Query query={SEARCH_REPOSITORIES} variables={{ ...DEFAULT_VARIABLES }}>
         {({ loading, error, data }) => {
           if (loading) return "Loading...";
           if (error) return `Error! ${error.message}`;
