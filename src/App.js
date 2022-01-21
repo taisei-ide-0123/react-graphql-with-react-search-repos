@@ -29,13 +29,22 @@ const App = () => {
         <input type="text" value={query} onChange={handleChange} />
       </form>
 
-      <Query query={SEARCH_REPOSITORIES} variables={{ ...DEFAULT_VARIABLES }}>
+      <Query
+        query={SEARCH_REPOSITORIES}
+        variables={{ ...DEFAULT_VARIABLES, query }}
+      >
         {({ loading, error, data }) => {
           if (loading) return "Loading...";
           if (error) return `Error! ${error.message}`;
 
-          console.log({ data });
-          return <div></div>;
+          console.log(data.search);
+          const search = data.search;
+          const repositoryCount = search.repositoryCount;
+          const repositoryUnit =
+            repositoryCount === 1 ? "Repository" : "Repositories";
+          const title = `Github Repositories Search Results - ${repositoryCount} ${repositoryUnit}`;
+
+          return <h2>{title}</h2>;
         }}
       </Query>
     </ApolloProvider>
