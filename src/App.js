@@ -16,7 +16,6 @@ const DEFAULT_VARIABLES = {
 const App = () => {
   const [query, setQuery] = useState(DEFAULT_VARIABLES.query);
   const [currnentVariables, setCurrentVariables] = useState(DEFAULT_VARIABLES);
-  console.log({ currnentVariables });
 
   const handleChange = (event) => {
     setQuery(event.target.value);
@@ -24,6 +23,16 @@ const App = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+  };
+
+  const goPrevious = (search) => {
+    setCurrentVariables({
+      first: null,
+      after: null,
+      last: PER_PAGE,
+      before: search.pageInfo.startCursor,
+      query: query,
+    });
   };
 
   const goNext = (search) => {
@@ -36,7 +45,6 @@ const App = () => {
     });
   };
 
-  console.log("query", query);
   return (
     <ApolloProvider client={client}>
       <form onSubmit={handleSubmit}>
@@ -45,13 +53,12 @@ const App = () => {
 
       <Query
         query={SEARCH_REPOSITORIES}
-        variables={{ ...DEFAULT_VARIABLES, query }}
+        variables={{ ...currnentVariables, query }}
       >
         {({ loading, error, data }) => {
           if (loading) return "Loading...";
           if (error) return `Error! ${error.message}`;
 
-          console.log(data.search);
           const search = data.search;
           const repositoryCount = search.repositoryCount;
           const repositoryUnit =
@@ -78,6 +85,9 @@ const App = () => {
                   );
                 })}
               </ul>
+              {search.pageInfo.hasPreviousPage ? (
+                <button onClick={() => goPrevious(search)}>Previous</button>
+              ) : null}
               {search.pageInfo.hasNextPage ? (
                 <button onClick={() => goNext(search)}>Next</button>
               ) : null}
