@@ -23,7 +23,18 @@ const StarButton = (props) => {
   };
 
   return (
-    <Mutation mutation={viewerHasStarred ? REMOVE_STAR : ADD_STAR}>
+    <Mutation
+      mutation={viewerHasStarred ? REMOVE_STAR : ADD_STAR}
+      refetchQueries={(mutationResult) => {
+        console.log(mutationResult);
+        return [
+          {
+            query: SEARCH_REPOSITORIES,
+            variables: { ...props.currnentVariables },
+          },
+        ];
+      }}
+    >
       {(addOrRemoveStar) => <StarStatus addOrRemoveStar={addOrRemoveStar} />}
     </Mutation>
   );
@@ -108,7 +119,10 @@ const App = () => {
                         {node.name}
                       </a>
                       &nbsp;
-                      <StarButton node={node} />
+                      <StarButton
+                        node={node}
+                        currnentVariables={currnentVariables}
+                      />
                     </li>
                   );
                 })}
